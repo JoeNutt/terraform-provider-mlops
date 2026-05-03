@@ -2,8 +2,12 @@ name: release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
+  # Enables manual execution from the GitHub Actions UI
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -32,6 +36,9 @@ jobs:
           version: latest
 
       - name: Run GoReleaser
+        # Only run GoReleaser if the workflow was triggered by a tag.
+        # Otherwise, it will fail on pushes to main or manual runs.
+        if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
